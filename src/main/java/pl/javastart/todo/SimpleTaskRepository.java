@@ -8,11 +8,11 @@ import java.util.Optional;
 @Repository
 class SimpleTaskRepository implements TaskRepository {
     private final EntityManager entityManager;
+    private static long nextId = 1;
 
     public SimpleTaskRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
-    private static long nextId = 1;
     @Transactional
     @Override
     public Task save(Task task) {
