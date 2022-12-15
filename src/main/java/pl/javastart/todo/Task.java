@@ -1,14 +1,20 @@
 package pl.javastart.todo;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
+import java.time.LocalDateTime;
+@Entity
 public class Task {
+    @Id
     private Long id;
     private String title;
     private String description;
     private int priority;
     private LocalDateTime startTime;
     private LocalDateTime completionTime;
+
+    public Task() {}
 
     public Task(String title, String description, int priority) {
         this.title = title;
