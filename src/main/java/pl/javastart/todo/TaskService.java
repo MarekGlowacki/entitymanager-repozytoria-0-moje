@@ -10,26 +10,28 @@ import java.util.Optional;
 
 @Service
 class TaskService {
-    private final TaskRepository taskRepository;
-
-    public TaskService(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
+    private final DbTaskRepository dbTaskRepository;
+    private static long nextId = 1;
+    public TaskService(DbTaskRepository taskRepository) {
+        this.dbTaskRepository = taskRepository;
     }
 
     @Transactional
     public Long saveTask(TaskDto task) {
         Task taskToSave = new Task(task.getTitle(), task.getDescription(), task.getPriority());
-        Task savedTask = taskRepository.save(taskToSave);
+        taskToSave.setId(nextId);
+        Task savedTask = dbTaskRepository.save(taskToSave);
+        nextId++;
         return savedTask.getId();
     }
 
     public Optional<String> getTaskInfo(Long taskId) {
-        return taskRepository.findById(taskId).map(Task::toString);
+        return dbTaskRepository.findById(taskId).map(Task::toString);
     }
 
     @Transactional
     public LocalDateTime startTask(Long taskId) {
-        Task task = taskRepository.findById(taskId)
+        Task task = dbTaskRepository.findById(taskId)
                 .orElseThrow(TaskNotFoundException::new);
         if (task.getStartTime() != null) {
             throw new TaskAlreadyStartedException();
@@ -40,7 +42,7 @@ class TaskService {
 
     @Transactional
     public TaskDurationDto endTask(Long taskId) {
-        Task task = taskRepository.findById(taskId)
+        Task task = dbTaskRepository.findById(taskId)
                 .orElseThrow(TaskNotFoundException::new);
         if (task.getStartTime() == null) {
             throw new TaskNotStartedException();

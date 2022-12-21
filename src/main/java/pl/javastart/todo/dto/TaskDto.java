@@ -1,6 +1,7 @@
 package pl.javastart.todo.dto;
 
 public class TaskDto {
+    private Long Id;
 
     private String title;
     private String description;
@@ -10,6 +11,14 @@ public class TaskDto {
         this.title = title;
         this.description = description;
         this.priority = priority;
+    }
+
+    public Long getId() {
+        return Id;
+    }
+
+    public void setId(Long id) {
+        Id = id;
     }
 
     public String getTitle() {
