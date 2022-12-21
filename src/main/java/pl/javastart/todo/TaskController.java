@@ -7,6 +7,7 @@ import pl.javastart.todo.exception.TaskAlreadyStartedException;
 import pl.javastart.todo.exception.TaskNotFoundException;
 import pl.javastart.todo.exception.TaskNotStartedException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Scanner;
 
 @Controller
@@ -46,12 +47,32 @@ class TaskController {
             switch (option) {
                 case ADD -> addTask();
                 case PRINT_SINGLE -> printTask();
+                case PRINT_UNSTARTED_TASKS -> printUnstartedTasks();
+                case PRINT_ENDED_TASKS -> printEndedTasks();
                 case START_TASK -> startTask();
                 case COMPLETE_TASK -> completeTask();
                 case EXIT -> exit();
             }
         } catch (TaskNotFoundException e) {
             System.out.println("Brak zadania ze wskazanym identyfikatorem");
+        }
+    }
+
+    private void printUnstartedTasks() {
+        List<Task> unstartedTasks = taskService.findUnstartedTasks();
+        if (unstartedTasks.isEmpty()){
+            System.out.println("Brak nierozpoczętych zadań");
+        } else {
+            unstartedTasks.forEach(System.out::println);
+        }
+    }
+
+    private void printEndedTasks() {
+        List<Task> endedTasks = taskService.findEndedTasks();
+        if (endedTasks.isEmpty()){
+            System.out.println("Brak zakończonych zadań");
+        } else {
+            endedTasks.forEach(System.out::println);
         }
     }
 
@@ -112,9 +133,11 @@ class TaskController {
     private enum Option {
         ADD(1, "Dodaj nowe zadanie"),
         PRINT_SINGLE(2, "Wyświetl zadanie"),
-        START_TASK(3, "Wystartuj zadanie"),
-        COMPLETE_TASK(4, "Zakończ zadanie"),
-        EXIT(5, "Koniec programu");
+        PRINT_UNSTARTED_TASKS(3, "Wyświetl nierozpoczęte zadania"),
+        PRINT_ENDED_TASKS(4, "Wyświetl zakończone zadania"),
+        START_TASK(5, "Wystartuj zadanie"),
+        COMPLETE_TASK(6, "Zakończ zadanie"),
+        EXIT(7, "Koniec programu");
 
         private final int number;
         private final String name;

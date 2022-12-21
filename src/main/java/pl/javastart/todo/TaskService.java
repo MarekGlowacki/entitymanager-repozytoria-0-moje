@@ -6,32 +6,33 @@ import pl.javastart.todo.dto.*;
 import pl.javastart.todo.exception.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 class TaskService {
-    private final DbTaskRepository dbTaskRepository;
+    private final TaskRepository taskRepository;
     private static long nextId = 1;
-    public TaskService(DbTaskRepository taskRepository) {
-        this.dbTaskRepository = taskRepository;
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
     }
 
     @Transactional
     public Long saveTask(TaskDto task) {
         Task taskToSave = new Task(task.getTitle(), task.getDescription(), task.getPriority());
         taskToSave.setId(nextId);
-        Task savedTask = dbTaskRepository.save(taskToSave);
+        Task savedTask = taskRepository.save(taskToSave);
         nextId++;
         return savedTask.getId();
     }
 
     public Optional<String> getTaskInfo(Long taskId) {
-        return dbTaskRepository.findById(taskId).map(Task::toString);
+        return taskRepository.findById(taskId).map(Task::toString);
     }
 
     @Transactional
     public LocalDateTime startTask(Long taskId) {
-        Task task = dbTaskRepository.findById(taskId)
+        Task task = taskRepository.findById(taskId)
                 .orElseThrow(TaskNotFoundException::new);
         if (task.getStartTime() != null) {
             throw new TaskAlreadyStartedException();
@@ -42,7 +43,7 @@ class TaskService {
 
     @Transactional
     public TaskDurationDto endTask(Long taskId) {
-        Task task = dbTaskRepository.findById(taskId)
+        Task task = taskRepository.findById(taskId)
                 .orElseThrow(TaskNotFoundException::new);
         if (task.getStartTime() == null) {
             throw new TaskNotStartedException();
@@ -51,5 +52,13 @@ class TaskService {
         }
         task.setCompletionTime(LocalDateTime.now());
         return new TaskDurationDto(task.getStartTime(), task.getCompletionTime());
+    }
+
+    public List<Task> findUnstartedTasks() {
+        return taskRepository.findAllByStartTimeIsNullOrderByPriorityDesc();
+    }
+
+    public List<Task> findEndedTasks() {
+        return taskRepository.findAllByCompletionTimeIsNotNullOrderByCompletionTimeDesc();
     }
 }
