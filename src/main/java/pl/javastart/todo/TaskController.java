@@ -82,8 +82,16 @@ class TaskController {
         System.out.println("Opis zadania:");
         String description = scanner.nextLine();
         System.out.println("Priorytet (wyższa liczba = wyższy priorytet):");
-        int priority = scanner.nextInt();
-        scanner.nextLine();
+        Integer priority = null;
+
+        while (priority == null ) {
+            if(scanner.hasNextInt()) {
+                priority = scanner.nextInt();
+            } else {
+                System.out.println("Priorytet musi być wyrażony jako liczba.");
+            }
+            scanner.nextLine();
+        }
         TaskDto task = new TaskDto(title, description, priority);
         Long savedTaskId = taskService.saveTask(task);
         System.out.println("Zadanie zapisane z identyfikatorem " + savedTaskId);
